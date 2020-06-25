@@ -1,0 +1,233 @@
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/plug.kak" noload
+
+# Colors
+
+colorscheme plastic_duck
+
+# Built in user binds
+
+map global user N ': new<ret>' -docstring 'New window'
+
+# Editing
+
+add-highlighter global/ number-lines -relative -hlcursor
+add-highlighter global/ show-matching
+
+hook global InsertChar \t %{ exec -draft -itersel h@ }
+set global tabstop 2
+set global indentwidth 2
+
+hook global BufSetOption filetype=rust %{
+  set-option buffer formatcmd 'rustfmt'
+  set-option buffer tabstop 4
+  set-option buffer indentwidth 4
+}
+
+define-command find -params 1 -shell-script-candidates %{ rg --files } %{ edit %arg{1} }
+
+map global user c ':comment-line<ret>' -docstring 'Comment / uncomment lines'
+
+# Modeline
+
+# hook global ModuleLoaded powerline %{ require-module powerline_plastic-duck }
+
+# provide-module powerline_plastic-duck %{
+#   set-option -add global powerline_themes "plastic_duck"
+
+#   define-command -hidden powerline-theme-plastic-duck %{
+#       declare-option -hidden str powerline_color00 "rgb:E0E3EB" # fg: bufname
+#       declare-option -hidden str powerline_color03 "rgb:3C465D" # bg: bufname
+#       declare-option -hidden str powerline_color05 "rgb:E0E3EB" # fg: position
+#       declare-option -hidden str powerline_color01 "rgb:2C3344" # bg: position
+#       declare-option -hidden str powerline_color02 "rgb:E0E3EB" # fg: git
+#       declare-option -hidden str powerline_color04 "rgb:143D52" # bg: git
+#       declare-option -hidden str powerline_color06 "rgb:2C3344" # fg: line-column
+#       declare-option -hidden str powerline_color09 "rgb:FF8C66" # bg: line-column
+#       declare-option -hidden str powerline_color07 "rgb:FFCC66" # fg: mode-info
+#       declare-option -hidden str powerline_color08 "rgb:3C465D" # base background
+
+#       declare-option -hidden str powerline_color30 "rgb:7c6f64" # unused
+#       declare-option -hidden str powerline_color31 "rgb:fbf1c7" # unused
+
+#       declare-option -hidden str powerline_next_bg %opt{powerline_color08}
+#       declare-option -hidden str powerline_base_bg %opt{powerline_color08}
+#   }
+# }
+
+declare-option -docstring "name of the git branch holding the current buffer" \
+    str modeline_git_branch
+
+hook global WinCreate .* %{
+  hook window NormalIdle .* %{ evaluate-commands %sh{
+      branch=$(cd "$(dirname "${kak_buffile}")" && git rev-parse --abbrev-ref HEAD 2>/dev/null)
+      if [ -n "${branch}" ]; then
+          printf 'set window modeline_git_branch %%{%s}' "${branch}"
+      fi
+  } }
+}
+
+hook global WinCreate .* %{ evaluate-commands %sh{
+  is_work_tree=$(cd "$(dirname "${kak_buffile}")" && git rev-parse --is-inside-work-tree 2>/dev/null)
+  if [ "${is_work_tree}" = 'true' ]; then
+    printf 'set-option window modelinefmt %%{%s}' "%val{bufname}  %opt{modeline_git_branch} %val{cursor_line}:%val{cursor_char_column} {{context_info}} {{mode_info}} - %val{client}@[%val{session}]"
+  else
+    printf 'set-option window modelinefmt %%{%s}' "%val{bufname} %val{cursor_line}:%val{cursor_char_column} {{context_info}} {{mode_info}} - %val{client}@[%val{session}]"
+  fi 
+}}
+
+# Clipboard
+
+hook global NormalKey '[ydc]' %{
+  nop %sh{
+    (printf '%s' "$kak_main_reg_dquote" | xsel --input --clipboard ) < /dev/null > /dev/null 2>&1 &
+  }
+}
+
+declare-user-mode system
+
+map global user s ': enter-user-mode system<ret>' -docstring 'System interaction'
+
+map global system p -docstring 'Paste (After)' '<a-!>wl-paste<ret>'
+map global system P -docstring 'Paste (Before)' '!wl-paste<ret>'
+map global system R -docstring 'Replace' '|wl-paste<ret>'
+
+# Grep
+
+set global grepcmd 'rg --column'
+map global user / ':grep ' -docstring 'Grep'
+
+# LSP
+
+plug "ul/kak-lsp" do %{
+  cargo build --release --locked
+  cargo install --force --path .
+} config %{
+  set global lsp_cmd "kak-lsp -s %val{session} -vvv --log /tmp/kak-lsp.log"
+  map global user l ': enter-user-mode lsp<ret>' -docstring 'LSP mode'
+
+  set-option global lsp_diagnostic_line_error_sign "!"
+  set-option global lsp_diagnostic_line_warning_sign "?"
+
+  define-command ne -docstring 'go to next error/warning from lsp' %{ lsp-find-error --include-warnings }
+  define-command pe -docstring 'go to previous error/warning from lsp' %{ lsp-find-error --previous --include-warnings }
+  define-command ee -docstring 'go to current error/warning from lsp' %{ lsp-find-error --include-warnings; lsp-find-error --previous --include-warnings }
+
+  define-command lsp-restart -docstring 'restart lsp server' %{ lsp-stop; lsp-start }
+
+  hook global WinSetOption filetype=(ruby|rust|javascript|typescript) %{
+      echo -debug "Enabling LSP for filtetype %opt{filetype}"
+
+      lsp-enable-window
+      # lsp-auto-hover-enable
+      # lsp-auto-hover-insert-mode-disable
+
+      set-option window lsp_hover_anchor true
+      set-face window DiagnosticError default+u
+      set-face window DiagnosticWarning default+u
+  }
+
+  hook global WinSetOption filetype=rust %{
+    set-option window lsp_server_configuration rust.clippy_preference="on"
+    hook window -group rust-inlay-hints BufReload .* rust-analyzer-inlay-hints
+    hook window -group rust-inlay-hints NormalIdle .* rust-analyzer-inlay-hints
+    hook window -group rust-inlay-hints InsertIdle .* rust-analyzer-inlay-hints
+    hook -once -always window WinSetOption filetype=.* %{
+      remove-hooks window rust-inlay-hints
+    }
+  }
+
+
+  hook global KakEnd .* lsp-exit
+}
+
+# Lint
+
+hook global WinSetOption filetype=ruby %{
+    set-option window lintcmd 'run() { cat "$1" | rubocop -s "$kak_buffile"; } && run '
+    lint-enable
+}
+
+# Crosshairs
+
+plug "insipx/kak-crosshairs" config %{
+  set-face global crosshairs_line default,default+bd
+  set-face global crosshairs_column default,default+bd
+  cursorline
+}
+
+# Autopairs
+
+plug "alexherbo2/auto-pairs.kak"
+
+# Easymotion
+
+plug "danr/kakoune-easymotion" config %{
+  map global user m ': enter-user-mode easymotion<ret>' -docstring 'Easymotion'
+}
+
+# Connect
+
+plug "alexherbo2/prelude.kak"
+plug "alexherbo2/connect.kak" config %{
+  declare-user-mode connect
+  map global user e ': enter-user-mode connect<ret>' -docstring 'Connect'
+
+  map global connect e ': connect-terminal ' -docstring 'Custom command...'
+
+  define-command connect-floating-terminal -params .. -shell-completion -docstring 'Run connect command in floating terminal window' %{
+    connect-shell %{
+      # alacritty --dimensions 120 40 --title 'kakoune-connect' -e sh -c "$@"
+      kitty --class 'kakoune-connect' --name 'kakoune-connect' -T 'kakoune-connect' -o remember_window_size=y -o initial_window_width=40c -o initial_window_height=10c -e sh -c "$@"
+    } %arg{@}
+  }
+
+  define-command connect-fuzzy-files -params .. -file-completion -docstring 'Open selected files with skim' %{
+    connect-floating-terminal sh -c %{
+      edit $(fd --type file . "$@" | sk)
+    } -- %arg{@}
+  }
+  map global connect f ': connect-fuzzy-files<ret>' -docstring 'Find file'
+  map global user f ': connect-fuzzy-files<ret>' -docstring 'Find file'
+
+
+  define-command connect-fuzzy-buffers -params ..1 -buffer-completion -docstring 'Open selected buffers with sk' %{
+    connect-floating-terminal sh -c %{
+      buffer $(buffer | grep -F "$1" | sk)
+    } -- %arg{@}
+  }
+  map global connect b ': connect-fuzzy-buffers<ret>' -docstring 'Find buffer'
+  map global user b ': connect-fuzzy-buffers<ret>' -docstring 'Find buffer'
+
+  define-command connect-lf-current -params .. -file-completion -docstring 'Open files with lf with current file selected' %{
+    connect-floating-terminal sh -c %{
+      EDITOR='edit' lf "$@"
+    } -- %val{buffile}
+  }
+  map global connect t ': connect-lf-current<ret>' -docstring 'Explore directory with current file'
+  map global user t ': connect-lf-current<ret>' -docstring 'Explore directory with current file'
+
+  define-command connect-lf-root -params .. -file-completion -docstring 'Open files with lf with root directory selected' %{
+    connect-floating-terminal sh -c %{
+      EDITOR='edit' lf $(git rev-parse --show-toplevel 2>/dev/null || pwd)
+    }
+  }
+  map global connect T ': connect-lf-root<ret>' -docstring 'Explore directory in project root'
+  map global user T ': connect-lf-root<ret>' -docstring 'Explore directory in project root'
+
+  define-command connect-tig-current -params .. -file-completion -docstring 'Open files with tig' %{
+    connect-floating-terminal sh -c %{
+      EDITOR='edit' tig "$@"
+    } -- %val{buffile}
+  }
+  map global connect g ': connect-tig-current<ret>' -docstring 'Open current file in Tig'
+  map global user g ': connect-tig-current<ret>' -docstring 'Open current file in Tig'
+
+  define-command connect-tig -params .. -file-completion -docstring 'Open files with tig' %{
+    connect-floating-terminal sh -c %{
+      EDITOR='edit' tig
+    }
+  }
+  map global connect G ': connect-tig<ret>' -docstring 'Open project in Tig'
+  map global user G ': connect-tig<ret>' -docstring 'Open project in Tig'
+}
