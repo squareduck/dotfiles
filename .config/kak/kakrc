@@ -110,6 +110,26 @@ plug "occivink/kakoune-expand" config %{
   map global normal <backspace> <space> -docstring 'remove all sels except main'
   map global normal <a-backspace> <a-space> -docstring 'remove main sel'
 
+  def -params 1 extend-line-down %{
+    exec "<a-:>%arg{1}X"
+  }
+
+  def -params 1 extend-line-up %{
+    exec "<a-:><a-;>%arg{1}K<a-;>"
+    try %{
+      exec -draft ';<a-K>\n<ret>'
+      exec X
+    }
+    exec '<a-;><a-X>'
+  }
+
+  def extend-line-both-ways %{
+    exec ':extend-line-up 1<ret>'
+    exec ':extend-line-down 1<ret>'
+  }
+
+  map global normal <=> ':extend-line-both-ways<ret>'
+
   declare-user-mode expand
   map global user e ': enter-user-mode expand<ret>' -docstring 'Expand selection'
   map global expand e ': expand<ret>' -docstring "expand"
@@ -225,7 +245,7 @@ plug "alexherbo2/connect.kak" config %{
 
   define-command connect-lf-current -params .. -file-completion -docstring 'Open files with lf with current file selected' %{
     connect-floating-terminal sh -c %{
-      EDITOR='edit' lf "$@"
+      EDITOR='edit' lf -command "source $HOME/.config/lf/connectlfrc" "$@"
     } -- %val{buffile}
   }
   map global connect t ': connect-lf-current<ret>' -docstring 'Explore directory with current file'
@@ -233,7 +253,7 @@ plug "alexherbo2/connect.kak" config %{
 
   define-command connect-lf-root -params .. -file-completion -docstring 'Open files with lf with root directory selected' %{
     connect-floating-terminal sh -c %{
-      EDITOR='edit' lf $(git rev-parse --show-toplevel 2>/dev/null || pwd)
+      EDITOR='edit' lf -command "source $HOME/.config/lf/connectlfrc" $(git rev-parse --show-toplevel 2>/dev/null || pwd)
     }
   }
   map global connect T ': connect-lf-root<ret>' -docstring 'Explore directory in project root'

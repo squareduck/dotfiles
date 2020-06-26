@@ -17,13 +17,13 @@
 ;==========================================================
 
 [colors]
-background = #222
-background-alt = #444
-foreground = #dfdfdf
-foreground-alt = #999
-primary = #ffb52a
-secondary = #e60053
-alert = #bd2c40
+background = #1f2430
+background-alt = #1f2430
+foreground = #e0e3eb
+foreground-alt = #777
+primary = #ffcc66
+secondary = #73d0ff
+alert = #f77e6e
 
 [bar/main]
 ;monitor = ${env:MONITOR:HDMI-1}
@@ -41,8 +41,8 @@ line-size = 2
 
 line-color = #f00
 
-border-size = 0
-border-color = #00000000
+border-bottom-size = 1
+border-color = #444
 
 padding-top = 2
 padding-left = 2

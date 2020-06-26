@@ -1,0 +1,8 @@
+cmd kak-edit ${{
+  $EDITOR $f
+}}
+
+map <enter> :{{
+  kak-edit
+  quit
+}}
