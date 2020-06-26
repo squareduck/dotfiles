@@ -38,7 +38,7 @@ export SKIM_DEFAULT_OPTIONS="--color 'dark,bg:#1f2430,fg:#e0e3eb,matched:#bae67e
 
 # Ruby
 alias be='bundle exec'
-alias rubocop='bundle exec rubocop'
+alias rubocop='be rubocop'
 
 # Go
 export GOPATH=$HOME/.go

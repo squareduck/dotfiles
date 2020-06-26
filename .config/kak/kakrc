@@ -84,13 +84,37 @@ hook global NormalKey '[ydc]' %{
   }
 }
 
-declare-user-mode system
+declare-user-mode meta
 
-map global user s ': enter-user-mode system<ret>' -docstring 'System interaction'
+map global user m ': enter-user-mode meta<ret>' -docstring 'Meta interaction'
 
-map global system p -docstring 'Paste (After)' '<a-!>wl-paste<ret>'
-map global system P -docstring 'Paste (Before)' '!wl-paste<ret>'
-map global system R -docstring 'Replace' '|wl-paste<ret>'
+map global meta p -docstring 'Paste (After)' '<a-!>wl-paste<ret>'
+map global meta P -docstring 'Paste (Before)' '!wl-paste<ret>'
+map global meta R -docstring 'Replace' '|wl-paste<ret>'
+
+# Surround
+
+plug "alexherbo2/surround.kak" config %{
+  map global user s ': surround<ret>' -docstring 'surround mode'
+  map global user S ': surround _ _ * *<ret>' -docstring 'surround mode with extra surrounding pairs'
+
+  # Optional
+  set-option global surround_begin auto-pairs-disable
+  set-option global surround_end auto-pairs-enable
+}
+
+# Expand
+
+plug "occivink/kakoune-expand" config %{
+  map global normal <space> ': expand<ret>'
+  map global normal <backspace> <space> -docstring 'remove all sels except main'
+  map global normal <a-backspace> <a-space> -docstring 'remove main sel'
+
+  declare-user-mode expand
+  map global user e ': enter-user-mode expand<ret>' -docstring 'Expand selection'
+  map global expand e ': expand<ret>' -docstring "expand"
+  map global expand E ': expand; enter-user-mode -lock expand<ret>' -docstring "expand lock"
+}
 
 # Grep
 
@@ -171,7 +195,7 @@ plug "danr/kakoune-easymotion" config %{
 plug "alexherbo2/prelude.kak"
 plug "alexherbo2/connect.kak" config %{
   declare-user-mode connect
-  map global user e ': enter-user-mode connect<ret>' -docstring 'Connect'
+  map global user C ': enter-user-mode connect<ret>' -docstring 'Connect'
 
   map global connect e ': connect-terminal ' -docstring 'Custom command...'
 

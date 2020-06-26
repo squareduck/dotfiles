@@ -59,7 +59,7 @@ super + g
 #   bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
 
 # Toggle floating on and off
-super + apostrophe
+super + t
   bspc node focused.tiled -t floating || bspc node focused.floating -t tiled
 
 # set the node flags
@@ -75,8 +75,8 @@ super + {_,shift + }{h,j,k,l}
 	bspc node -{f,s} {west,south,north,east}
 
 # focus the node for the given path jump
-super + {p,b,comma,period}
-	bspc node -f @{parent,brother,first,second}
+# super + {p,b,f,s}
+# 	bspc node -f @{parent,brother,first,second}
 
 # focus the next/previous node in the current desktop
 super + {_,shift + }c
@@ -156,3 +156,19 @@ XF86AudioRaiseVolume
 
 XF86AudioMute
 	pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+#
+# Scratchpad
+#
+
+super + apostrophe
+  tdrop --wm bspwm -ma -y 40 -x 15 -w 1884 -h 600 kitty
+
+super + comma
+  tdrop --wm bspwm -ma -y 40 -x 15 -w 932 -h 1022 qutebrowser
+
+super + period
+  tdrop --wm bspwm -ma -y 40 -x 970 -w 932 -h 1022 qutebrowser
+
+super + backslash
+  tdrop --wm bspwm -ma -y 40 -x 970 -w 932 -h 1022 bitwarden
