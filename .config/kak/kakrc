@@ -26,7 +26,8 @@ hook global BufSetOption filetype=rust %{
 
 define-command find -params 1 -shell-script-candidates %{ rg --files } %{ edit %arg{1} }
 
-map global user c ':comment-line<ret>' -docstring 'Comment / uncomment lines'
+map global normal '#' :comment-line<ret> -docstring 'comment line'
+map global normal '<a-#>' :comment-block<ret> -docstring 'comment block'
 
 # Modeline
 
@@ -128,7 +129,9 @@ plug "occivink/kakoune-expand" config %{
     exec ':extend-line-down 1<ret>'
   }
 
-  map global normal <=> ':extend-line-both-ways<ret>'
+  map global normal = ':extend-line-both-ways<ret>'
+  map global normal + ':extend-line-down 1<ret>'
+  map global normal -- - ':extend-line-up 1<ret>'
 
   declare-user-mode expand
   map global user e ': enter-user-mode expand<ret>' -docstring 'Expand selection'
