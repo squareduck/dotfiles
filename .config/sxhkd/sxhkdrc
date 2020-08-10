@@ -162,13 +162,13 @@ XF86AudioMute
 #
 
 super + apostrophe
-  tdrop --wm bspwm -ma -y 40 -x 15 -w 1884 -h 600 kitty
+  tdrop -a -y 40 -x 15 -w 1884 -h 600 kitty
 
 super + comma
-  tdrop --wm bspwm -ma -y 40 -x 15 -w 932 -h 1022 qutebrowser
+  tdrop -a -y 40 -x 15 -w 932 -h 1022 qutebrowser
 
 super + period
-  tdrop --wm bspwm -ma -y 40 -x 970 -w 932 -h 1022 qutebrowser
+  tdrop -a -y 40 -x 970 -w 932 -h 1022 qutebrowser
 
 super + backslash
-  tdrop --wm bspwm -ma -y 40 -x 970 -w 932 -h 1022 bitwarden
+  tdrop -a -y 40 -x 970 -w 932 -h 1022 bitwarden

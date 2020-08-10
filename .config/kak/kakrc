@@ -139,6 +139,9 @@ plug "occivink/kakoune-expand" config %{
   map global expand E ': expand; enter-user-mode -lock expand<ret>' -docstring "expand lock"
 }
 
+# Pager
+plug "eraserhd/kak-ansi"
+
 # Grep
 
 set global grepcmd 'rg --column'
@@ -177,8 +180,8 @@ plug "ul/kak-lsp" do %{
   hook global WinSetOption filetype=rust %{
     set-option window lsp_server_configuration rust.clippy_preference="on"
     hook window -group rust-inlay-hints BufReload .* rust-analyzer-inlay-hints
-    hook window -group rust-inlay-hints NormalIdle .* rust-analyzer-inlay-hints
-    hook window -group rust-inlay-hints InsertIdle .* rust-analyzer-inlay-hints
+    # hook window -group rust-inlay-hints NormalIdle .* rust-analyzer-inlay-hints
+    # hook window -group rust-inlay-hints InsertIdle .* rust-analyzer-inlay-hints
     hook -once -always window WinSetOption filetype=.* %{
       remove-hooks window rust-inlay-hints
     }
