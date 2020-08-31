@@ -15,13 +15,13 @@ evaluate-commands %sh{
   editor_selection_primary_bg='rgb:3C465D'
 
   editor_selection_secondary_fg=$default
-  editor_selection_secondary_bg='rgb:2C3344'
+  editor_selection_secondary_bg='rgb:2B3243'
 
   editor_cursor_primary_fg=$editor_inverted_fg
   editor_cursor_primary_bg='rgb:FFCC66'
 
   editor_cursor_secondary_fg=$editor_inverted_fg
-  editor_cursor_secondary_bg='rgb:E8C47D'
+  editor_cursor_secondary_bg='rgb:d9bf8d'
 
   editor_cursor_alt_primary_fg=$editor_inverted_fg
   editor_cursor_alt_primary_bg='rgb:FF8C66'
