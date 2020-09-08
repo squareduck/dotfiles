@@ -29,33 +29,6 @@ define-command find -params 1 -shell-script-candidates %{ rg --files } %{ edit %
 map global normal '#' :comment-line<ret> -docstring 'comment line'
 map global normal '<a-#>' :comment-block<ret> -docstring 'comment block'
 
-# Modeline
-
-# hook global ModuleLoaded powerline %{ require-module powerline_plastic-duck }
-
-# provide-module powerline_plastic-duck %{
-#   set-option -add global powerline_themes "plastic_duck"
-
-#   define-command -hidden powerline-theme-plastic-duck %{
-#       declare-option -hidden str powerline_color00 "rgb:E0E3EB" # fg: bufname
-#       declare-option -hidden str powerline_color03 "rgb:3C465D" # bg: bufname
-#       declare-option -hidden str powerline_color05 "rgb:E0E3EB" # fg: position
-#       declare-option -hidden str powerline_color01 "rgb:2C3344" # bg: position
-#       declare-option -hidden str powerline_color02 "rgb:E0E3EB" # fg: git
-#       declare-option -hidden str powerline_color04 "rgb:143D52" # bg: git
-#       declare-option -hidden str powerline_color06 "rgb:2C3344" # fg: line-column
-#       declare-option -hidden str powerline_color09 "rgb:FF8C66" # bg: line-column
-#       declare-option -hidden str powerline_color07 "rgb:FFCC66" # fg: mode-info
-#       declare-option -hidden str powerline_color08 "rgb:3C465D" # base background
-
-#       declare-option -hidden str powerline_color30 "rgb:7c6f64" # unused
-#       declare-option -hidden str powerline_color31 "rgb:fbf1c7" # unused
-
-#       declare-option -hidden str powerline_next_bg %opt{powerline_color08}
-#       declare-option -hidden str powerline_base_bg %opt{powerline_color08}
-#   }
-# }
-
 declare-option -docstring "name of the git branch holding the current buffer" \
     str modeline_git_branch
 
@@ -107,9 +80,7 @@ plug "alexherbo2/surround.kak" config %{
 # Expand
 
 plug "occivink/kakoune-expand" config %{
-  map global normal <space> ': expand<ret>'
-  map global normal <backspace> <space> -docstring 'remove all sels except main'
-  map global normal <a-backspace> <a-space> -docstring 'remove main sel'
+  map global normal = ': expand<ret>'
 
   def -params 1 extend-line-down %{
     exec "<a-:>%arg{1}X"
@@ -129,9 +100,9 @@ plug "occivink/kakoune-expand" config %{
     exec ':extend-line-down 1<ret>'
   }
 
-  map global normal = ':extend-line-both-ways<ret>'
-  map global normal + ':extend-line-down 1<ret>'
-  map global normal -- - ':extend-line-up 1<ret>'
+  map global normal + ':extend-line-both-ways<ret>'
+  map global normal -- - ':extend-line-down 1<ret>'
+  map global normal _ ':extend-line-up 1<ret>'
 
   declare-user-mode expand
   map global user e ': enter-user-mode expand<ret>' -docstring 'Expand selection'
