@@ -80,7 +80,7 @@ blacklist-0 = num lock
 
 format-prefix = "kbd "
 format-prefix-foreground = ${colors.foreground-alt}
-label-layout = %layout%
+label-layout = %name%
 
 [module/filesystem]
 type = internal/fs

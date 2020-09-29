@@ -15,23 +15,7 @@ dyn-wall-rs -d $HOME/pictures/dynamic-wallpapers/lakeside &
 killall nm-applet
 nm-applet &
 
-bspc monitor primary -d h b w wr p pr v1 v2 c m
-
-if [ $(bspc query -M | wc -w) -eq 2 ]; then
-  bspc desktop b  -m DP-1-3
-  bspc desktop wr -m DP-1-3
-  bspc desktop pr -m DP-1-3
-  bspc desktop v2 -m DP-1-3
-  bspc desktop m  -m DP-1-3
-
-  bspc desktop Desktop -r
-  bspc desktop Desktop -r
-  bspc desktop Desktop -r
-  bspc desktop Desktop -r
-  bspc desktop Desktop -r
-
-  bspc wm -O eDP-1 DP-1-3
-fi
+bspc monitor primary -d h b w1 w2 w3 w4 v1 v2 c m
 
 bspc config ignore_ewmh_focus true
 bspc config ignore_ewmh_fullscreen true

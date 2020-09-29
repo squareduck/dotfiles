@@ -5,10 +5,6 @@ plug "andreyorst/plug.kak" noload
 
 colorscheme plastic_duck
 
-# Built in user binds
-
-map global user N ': new<ret>' -docstring 'New window'
-
 # Editing
 
 add-highlighter global/ number-lines -relative -hlcursor
