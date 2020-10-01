@@ -114,6 +114,12 @@ plug "eraserhd/kak-ansi"
 set global grepcmd 'rg --column'
 map global user / ':grep ' -docstring 'Grep'
 
+# i3
+plug "Delapouite/kakoune-i3" config %{
+  require-module x11
+  map global user w ': enter-user-mode i3<ret>' -docstring 'i3...'
+}
+
 # LSP
 
 plug "ul/kak-lsp" do %{
