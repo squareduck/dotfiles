@@ -65,12 +65,10 @@ map global meta R -docstring 'Replace' '|wl-paste<ret>'
 # Surround
 
 plug "alexherbo2/surround.kak" config %{
+  require-module surround
+
   map global user s ': surround<ret>' -docstring 'surround mode'
   map global user S ': surround _ _ * *<ret>' -docstring 'surround mode with extra surrounding pairs'
-
-  # Optional
-  set-option global surround_begin auto-pairs-disable
-  set-option global surround_end auto-pairs-enable
 }
 
 # Expand
@@ -191,65 +189,57 @@ plug "danr/kakoune-easymotion" config %{
 
 # Connect
 
-plug "alexherbo2/prelude.kak"
-plug "alexherbo2/connect.kak" config %{
-  declare-user-mode connect
-  map global user C ': enter-user-mode connect<ret>' -docstring 'Connect'
+plug "alexherbo2/prelude.kak" config %{
+  require-module prelude
+}
 
-  map global connect e ': connect-terminal ' -docstring 'Custom command...'
+plug "alexherbo2/connect.kak" config %{
+  require-module connect
+  require-module connect-rofi
+
+  declare-user-mode connect
+
+  map global user c ': enter-user-mode connect<ret>' -docstring 'Connect'
+
+  map global connect c ': connect-floating-terminal ' -docstring 'Custom command...'
 
   define-command connect-floating-terminal -params .. -shell-completion -docstring 'Run connect command in floating terminal window' %{
-    connect-shell %{
-      # alacritty --dimensions 120 40 --title 'kakoune-connect' -e sh -c "$@"
-      kitty --class 'kakoune-connect' --name 'kakoune-connect' -T 'kakoune-connect' -o remember_window_size=y -o initial_window_width=40c -o initial_window_height=10c -e sh -c "$@"
-    } %arg{@}
+    $ kitty --class 'utility' -e sh -c %{ "$@" } -- %arg{@}
   }
 
-  define-command connect-fuzzy-files -params .. -file-completion -docstring 'Open selected files with skim' %{
-    connect-floating-terminal sh -c %{
-      edit $(fd --type file . "$@" | sk)
-    } -- %arg{@}
+  define-command connect-fuzzy-files -file-completion -docstring 'Open selected files with skim' %{
+    $ kitty --class 'utility' -e sh -c ":edit $(fd . | sk)"
   }
   map global connect f ': connect-fuzzy-files<ret>' -docstring 'Find file'
   map global user f ': connect-fuzzy-files<ret>' -docstring 'Find file'
 
 
   define-command connect-fuzzy-buffers -params ..1 -buffer-completion -docstring 'Open selected buffers with sk' %{
-    connect-floating-terminal sh -c %{
-      buffer $(buffer | grep -F "$1" | sk)
-    } -- %arg{@}
+    $ kitty --class 'utility' -e sh -c ":buffer $(:ls | sk)"
   }
   map global connect b ': connect-fuzzy-buffers<ret>' -docstring 'Find buffer'
   map global user b ': connect-fuzzy-buffers<ret>' -docstring 'Find buffer'
 
   define-command connect-lf-current -params .. -file-completion -docstring 'Open files with lf with current file selected' %{
-    connect-floating-terminal sh -c %{
-      EDITOR='edit' lf -command "source $HOME/.config/lf/connectlfrc" "$@"
-    } -- %val{buffile}
+    $ kitty --class 'utility' -e sh -c %{ EDITOR=':edit' lf -command "source $HOME/.config/lf/connectlfrc" "$@" } -- %val{buffile}
   }
   map global connect t ': connect-lf-current<ret>' -docstring 'Explore directory with current file'
   map global user t ': connect-lf-current<ret>' -docstring 'Explore directory with current file'
 
   define-command connect-lf-root -params .. -file-completion -docstring 'Open files with lf with root directory selected' %{
-    connect-floating-terminal sh -c %{
-      EDITOR='edit' lf -command "source $HOME/.config/lf/connectlfrc" $(git rev-parse --show-toplevel 2>/dev/null || pwd)
-    }
+    $ kitty --class 'utility' -e sh -c %{ EDITOR=':edit' lf -command "source $HOME/.config/lf/connectlfrc" "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" }
   }
   map global connect T ': connect-lf-root<ret>' -docstring 'Explore directory in project root'
   map global user T ': connect-lf-root<ret>' -docstring 'Explore directory in project root'
 
   define-command connect-tig-current -params .. -file-completion -docstring 'Open files with tig' %{
-    connect-floating-terminal sh -c %{
-      EDITOR='edit' tig "$@"
-    } -- %val{buffile}
+    $ kitty --class 'utility' -e sh -c %{ EDITOR=':edit' tig "$@" } -- %val{buffile}
   }
   map global connect g ': connect-tig-current<ret>' -docstring 'Open current file in Tig'
   map global user g ': connect-tig-current<ret>' -docstring 'Open current file in Tig'
 
   define-command connect-tig -params .. -file-completion -docstring 'Open files with tig' %{
-    connect-floating-terminal sh -c %{
-      EDITOR='edit' tig
-    }
+    $ kitty --class 'utility' -e sh -c %{ EDITOR=':edit' tig }
   }
   map global connect G ': connect-tig<ret>' -docstring 'Open project in Tig'
   map global user G ': connect-tig<ret>' -docstring 'Open project in Tig'

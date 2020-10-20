@@ -1,0 +1,15 @@
+[user]
+	email = daniil@squaredu.cc
+	name = Daniil Velichko
+
+[core]
+  pager = delta
+
+[delta]
+  plus-color = "#506336"
+  minus-color = "#993F33"
+  syntax-theme = plastic-duck
+  side-by-side = true
+
+[interactive]
+  diffFilter = delta --color-only

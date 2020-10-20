@@ -1,0 +1,26 @@
+#!/bin/bash
+if [ "$AUTORANDR_CURRENT_PROFILE" = "docked" ]
+then
+  killall polybar
+  MONITOR=eDP-1 polybar main&
+  MONITOR=DP-1-3 polybar secondary&
+  killall dyn-wall-rs
+  dyn-wall-rs -d $HOME/pictures/dynamic-wallpapers/pangong &
+  killall picom
+  picom&
+  killall nm-applet
+  nm-applet&
+
+  exit
+else
+  killall polybar
+  MONITOR=eDP-1 polybar main&
+  killall dyn-wall-rs
+  dyn-wall-rs -d $HOME/pictures/dynamic-wallpapers/lakeside &
+  killall picom
+  picom&
+  killall nm-applet
+  nm-applet&
+
+  exit
+fi
