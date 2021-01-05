@@ -9,7 +9,8 @@
   plus-color = "#506336"
   minus-color = "#993F33"
   syntax-theme = plastic-duck
-  side-by-side = true
+  line-numbers = true
+  side-by-side = false
 
 [interactive]
   diffFilter = delta --color-only
