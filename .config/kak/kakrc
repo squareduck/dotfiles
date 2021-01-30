@@ -230,6 +230,12 @@ plug "alexherbo2/connect.kak" config %{
   map global connect r ': connect-fuzzy-changes<ret>' -docstring 'Find changed file'
   map global user r ': connect-fuzzy-changes<ret>' -docstring 'Find changed file'
 
+  define-command connect-fuzzy-alternate -file-completion -docstring 'Open alternative files with skim' %{
+    $ kitty --class 'utility' -e sh -c ":edit $(alt $@ | sk)" -- %val{bufname}
+  }
+  map global connect a ': connect-fuzzy-alternate<ret>' -docstring 'Find alternative file'
+  map global user a ': connect-fuzzy-alternate<ret>' -docstring 'Find alternative file'
+
   define-command connect-fuzzy-buffers -params ..1 -buffer-completion -docstring 'Open selected buffers with sk' %{
     $ kitty --class 'utility' -e sh -c ":buffer $(:ls | sk)"
   }
